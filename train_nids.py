@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as pd_tf  # Using tensorflow for Keras
 import tensorflow as tf
-from tensorflow import keras
+from tensorflow import keras        # type: ignore
 from tensorflow.keras import layers # type: ignore
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -212,13 +212,16 @@ def print_metrics(model_name, y_true, y_pred, class_names):
 import sys
 
 def main():
+    # Create artifacts directory if it doesn't exist
+    os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+    # Create outputs directory if it doesn't exist
+    os.makedirs('outputs', exist_ok=True)
+
     # Redirect stdout to a file
     original_stdout = sys.stdout
     with open('outputs/nids_results.txt', 'w') as f:
         sys.stdout = f
         try:
-            # Create artifacts directory if it doesn't exist
-            os.makedirs(ARTIFACTS_DIR, exist_ok=True)
             
             X_train, X_test, y_train, y_test, class_names, scaler, le, feature_names = load_and_preprocess_data(DATASET_PATH)
             

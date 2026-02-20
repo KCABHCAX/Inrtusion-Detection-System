@@ -142,8 +142,10 @@ class MainPage(ctk.CTkFrame):
             self.selected_file = filename
             self.file_path_label.configure(text=f"Selected: {os.path.basename(filename)}")
             try:
-                os.makedirs("data", exist_ok=True)
-                dest = os.path.join("data", "probe_flow.csv")
+                BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+                data_dir = os.path.join(BASE_DIR, "data")
+                os.makedirs(data_dir, exist_ok=True)
+                dest = os.path.join(data_dir, "probe_flow.csv")
                 import shutil
                 shutil.copy(filename, dest)
                 self.status_label.configure(text="File uploaded successfully", text_color="#4CAF50")
@@ -157,13 +159,13 @@ class MainPage(ctk.CTkFrame):
 
     def run_training_script(self):
         try:
-            # We will read the output from outputs/nids_results.txt if the script writes there
-            # But the script also prints to stdout because of how we call it? 
-            # Actually train_nids.py redirects stdout to outputs/nids_results.txt internally.
-            # So we should just run it and then read the file.
+            # Determine base directory (where gui_nids_dashboard.py is located)
+            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+            script_path = os.path.join(BASE_DIR, "train_nids.py")
             
             process = subprocess.Popen(
-                [sys.executable, "train_nids.py"],
+                [sys.executable, script_path],
+                cwd=BASE_DIR,  # Run in the project root
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
@@ -171,7 +173,7 @@ class MainPage(ctk.CTkFrame):
             stdout, stderr = process.communicate()
             
             # Read prediction file if exists
-            output_file = "outputs/nids_results.txt"
+            output_file = os.path.join(BASE_DIR, "outputs", "nids_results.txt")
             if os.path.exists(output_file):
                 with open(output_file, "r") as f:
                     full_output = f.read()
@@ -196,7 +198,11 @@ class MainPage(ctk.CTkFrame):
             messagebox.showerror("Error", message)
 
     def start_analysis(self):
-        if not self.selected_file and not os.path.exists("data/probe_flow.csv"):
+        # Check for data file existence using absolute path
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        data_path = os.path.join(BASE_DIR, "data", "probe_flow.csv")
+        
+        if not self.selected_file and not os.path.exists(data_path):
             messagebox.showwarning("Warning", "Upload CSV first!")
             return
 
@@ -206,9 +212,12 @@ class MainPage(ctk.CTkFrame):
 
     def run_analysis_script(self):
         try:
-            script_path = os.path.join("inference", "explain_flow.py")
+            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+            script_path = os.path.join(BASE_DIR, "inference", "explain_flow.py")
+            
             process = subprocess.Popen(
                 [sys.executable, script_path],
+                cwd=BASE_DIR, # Run in the project root
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
