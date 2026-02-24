@@ -21,7 +21,7 @@ from explainability.anomaly_detector import train_anomaly_detector, compute_anom
 # --- Configuration ---
 # Use the dataset found in the current environment
 WORKSPACE_DATASET = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Dataset', 'NIDS_FINAL_DATASET.csv'))
-SINGLE_FLOW_INPUT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'probe_flow.csv'))
+SINGLE_FLOW_INPUT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'bruteforce_flow.csv'))
 
 def get_data_and_scaler(filepath):
     """
